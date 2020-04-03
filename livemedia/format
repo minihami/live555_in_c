@@ -1,0 +1,36 @@
+
+/*****************************************************************
+ * HashTable (Structure Declarations)
+ ****************************************************************/
+
+/*****************************************************************
+ * HashTable (Function Declarations)
+ ****************************************************************/
+/*
+ * Internal Functions for new() and delete() functions
+ */
+
+livemedia_hash_table_t *__livemedia_hash_table__alloc();
+void __livemedia_hash_table__init(livemedia_hash_table_t *hash_table);
+void __livemedia_hash_table__deinit(livemedia_hash_table_t *hash_table);
+void __livemedia_hash_table__free(livemedia_hash_table_t *hash_table);
+/*
+ * new() and delete() functions
+ */
+livemedia_hash_table_t *livemedia__new__hash_table();
+void livemedia__delete__hash_table(livemedia_hash_table_t *hash_table);
+/*
+ * Functions for virtual functions
+ */
+
+/*
+ * Override functions
+ */
+
+/*
+ * Functions in header file
+ */
+
+/*
+ * Normal functions
+ */
