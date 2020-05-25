@@ -51,6 +51,9 @@ void __livemedia_hash_table__free(livemedia_hash_table_t *hash_table)
  */
 livemedia_hash_table_t *livemedia__new__hash_table(void)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	livemedia_hash_table_t *hash_table;
 
 	hash_table = __livemedia_hash_table__alloc();
@@ -80,7 +83,10 @@ void *livemedia_hash_table__add(livemedia_hash_table_t *hash_table, char const *
 bool livemedia_hash_table__remove(livemedia_hash_table_t *hash_table, char const *key)
 {
 	if (hash_table->remove)
+	{
+		printf("key: %s entry removed!\n", key);
 		return hash_table->remove(hash_table, key);
+	}
 	return false;
 }
 
@@ -103,6 +109,9 @@ unsigned int livemedia_hash_table__num_entries(livemedia_hash_table_t *hash_tabl
  */
 void livemedia_hash_table__delete__impl(livemedia_hash_table_t *hash_table)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	if (hash_table) {
 		__livemedia_hash_table__deinit(hash_table);
 		__livemedia_hash_table__free(hash_table);
@@ -114,6 +123,9 @@ void livemedia_hash_table__delete__impl(livemedia_hash_table_t *hash_table)
  */
 bool livemedia_hash_table__is_empty(livemedia_hash_table_t *hash_table)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	return (livemedia_hash_table__num_entries(hash_table) == 0);
 }
 
@@ -122,6 +134,9 @@ bool livemedia_hash_table__is_empty(livemedia_hash_table_t *hash_table)
  */
 void *livemedia_hash_table__remove_next(livemedia_hash_table_t *hash_table)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	livemedia_hash_table_iterator_t *iter;
 	char const *key;
 	void *removed_value;
@@ -137,6 +152,9 @@ void *livemedia_hash_table__remove_next(livemedia_hash_table_t *hash_table)
 
 void *livemedia_hash_table__get_first(livemedia_hash_table_t *hash_table)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	livemedia_hash_table_iterator_t *iter;
 	char const *key;
 	void *first_value;
@@ -192,6 +210,9 @@ void __livemedia_hash_table_iterator__free(
  */
 livemedia_hash_table_iterator_t *livemedia__new__hash_table_iterator(void)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	livemedia_hash_table_iterator_t *hash_table_iterator;
 
 	hash_table_iterator = __livemedia_hash_table_iterator__alloc();
@@ -225,6 +246,9 @@ void *livemedia_hash_table_iterator__next(
 void livemedia_hash_table_iterator__delete__impl(
 		livemedia_hash_table_iterator_t *hash_table_iterator)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	if (hash_table_iterator) {
 		__livemedia_hash_table_iterator__deinit(hash_table_iterator);
 		__livemedia_hash_table_iterator__free(hash_table_iterator);

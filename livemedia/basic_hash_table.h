@@ -132,7 +132,7 @@ unsigned int livemedia_basic_hash_table__hash_index_from_key(
 livemedia_basic_hash_table_iterator_t *__livemedia_basic_hash_table_iterator__alloc(void);
 void __livemedia_basic_hash_table_iterator__init(
 		livemedia_basic_hash_table_iterator_t *basic_hash_table_iterator,
-		livemedia_basic_hash_table_t const *table);
+		livemedia_basic_hash_table_t *table);
 void __livemedia_basic_hash_table_iterator__deinit(
 		livemedia_basic_hash_table_iterator_t *basic_hash_table_iterator);
 void __livemedia_basic_hash_table_iterator__free(

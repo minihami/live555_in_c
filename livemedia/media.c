@@ -52,7 +52,7 @@ void __livemedia_medium__init(livemedia_medium_t *medium)
 	medium->is_server_media_session = livemedia_medium__is_server_media_session__impl;
 	medium->delete = livemedia_medium__delete__impl;
 }
-static void on_close_cb(uv_handle_t *handle) {
+static void on_timer_close_cb(uv_handle_t *handle) {
 	uv_timer_t *timer = (uv_timer_t *)handle;
 	free(timer);
 }
@@ -60,7 +60,7 @@ void __livemedia_medium__deinit(livemedia_medium_t *medium)
 {
 	if (medium->next_task) {
 		uv_timer_stop(medium->next_task);
-		uv_close((uv_handle_t *)medium->next_task, on_close_cb);
+		uv_close((uv_handle_t *)medium->next_task, on_timer_close_cb);
 	}
 }
 void __livemedia_medium__free(livemedia_medium_t *medium)
@@ -76,6 +76,9 @@ void __livemedia_medium__free(livemedia_medium_t *medium)
  */
 livemedia_medium_t *livemedia__new__medium(void)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	livemedia_medium_t *medium;
 
 	medium = __livemedia_medium__alloc();
@@ -140,34 +143,58 @@ bool livemedia_medium__is_server_media_session(livemedia_medium_t *medium)
  */
 bool livemedia_medium__is_source__impl(livemedia_medium_t *medium)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	return false; /* default implementation */
 }
 bool livemedia_medium__is_sink__impl(livemedia_medium_t *medium)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	return false; /* default implementation */
 }
 bool livemedia_medium__is_rtcp_instance__impl(livemedia_medium_t *medium)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	return false; /* default implementation */
 }
 bool livemedia_medium__is_rtsp_client__impl(livemedia_medium_t *medium)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	return false; /* default implementation */
 }
 bool livemedia_medium__is_rtsp_server__impl(livemedia_medium_t *medium)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	return false; /* default implementation */
 }
 bool livemedia_medium__is_media_session__impl(livemedia_medium_t *medium)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	return false; /* default implementation */
 }
 bool livemedia_medium__is_server_media_session__impl(livemedia_medium_t *medium)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	return false; /* default implementation */
 }
 void livemedia_medium__delete__impl(livemedia_medium_t *medium)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	if (medium) {
 		__livemedia_medium__deinit(medium);
 		__livemedia_medium__free(medium);
@@ -179,7 +206,17 @@ void livemedia_medium__delete__impl(livemedia_medium_t *medium)
  */
 char const* livemedia_medium__name(livemedia_medium_t *medium)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	return medium->medium_name;
+}
+uv_timer_t *livemedia_medium__next_task(livemedia_medium_t *medium)
+{
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
+	return medium->next_task;
 }
 
 /*
@@ -188,6 +225,9 @@ char const* livemedia_medium__name(livemedia_medium_t *medium)
 bool livemedia_medium__lookup_by_name__static(char const* medium_name,
 		livemedia_medium_t **result_medium)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	livemedia_media_lookup_table_t *media_lookup_table;
 	media_lookup_table = livemedia_media_lookup_table__our_media__static();
 	*result_medium = livemedia_media_lookup_table__lookup(media_lookup_table, 
@@ -201,12 +241,18 @@ bool livemedia_medium__lookup_by_name__static(char const* medium_name,
 }
 void livemedia_medium__close_by_medium_name__static(char const* medium_name)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	livemedia_media_lookup_table_t *media_lookup_table;
 	media_lookup_table = livemedia_media_lookup_table__our_media__static();
 	livemedia_media_lookup_table__remove(media_lookup_table, medium_name);
 }
 void livemedia_medium__close_by_medium_ptr__static(livemedia_medium_t* medium)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	if(medium == NULL)
 		return;
 	livemedia_medium__close_by_medium_name__static(livemedia_medium__name(medium));
@@ -258,6 +304,9 @@ void __livemedia_media_lookup_table__free(
  */
 livemedia_media_lookup_table_t *livemedia__new__media_lookup_table(void)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	livemedia_media_lookup_table_t *media_lookup_table;
 	media_lookup_table = __livemedia_media_lookup_table__alloc();
 	if (media_lookup_table)
@@ -281,6 +330,9 @@ void livemedia__delete__media_lookup_table(
 void livemedia_media_lookup_table__delete__impl(
 		livemedia_media_lookup_table_t *media_lookup_table)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	if (media_lookup_table) {
 		__livemedia_media_lookup_table__deinit(media_lookup_table);
 		__livemedia_media_lookup_table__free(media_lookup_table);
@@ -294,6 +346,9 @@ void livemedia_media_lookup_table__delete__impl(
 livemedia_hash_table_t const *livemedia_media_lookup_table__get_table(
 		livemedia_media_lookup_table_t *media_lookup_table)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	return media_lookup_table->table;
 }
 /*
@@ -301,6 +356,9 @@ livemedia_hash_table_t const *livemedia_media_lookup_table__get_table(
  */
 livemedia_media_lookup_table_t *livemedia_media_lookup_table__our_media__static(void)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	livemedia_tables_t* our_tables;
 	
 	our_tables = livemedia_tables__get_our_tables__static(true);
@@ -314,6 +372,9 @@ livemedia_media_lookup_table_t *livemedia_media_lookup_table__our_media__static(
 livemedia_medium_t *livemedia_media_lookup_table__lookup(
 		livemedia_media_lookup_table_t *media_lookup_table, char const* name)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	return (livemedia_medium_t *)livemedia_hash_table__lookup(media_lookup_table->table,
 			name);
 }
@@ -321,11 +382,17 @@ void livemedia_media_lookup_table__add_new(
 		livemedia_media_lookup_table_t* media_lookup_table, livemedia_medium_t* medium,
 		char* medium_name)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	livemedia_hash_table__add(media_lookup_table->table, medium_name, (void *)medium);
 }
 void livemedia_media_lookup_table__remove(
 		livemedia_media_lookup_table_t* media_lookup_table,	char const *name)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	livemedia_medium_t *medium;
 	livemedia_tables_t *our_tables;
 
@@ -347,6 +414,9 @@ void livemedia_media_lookup_table__generate_new_name(
 		livemedia_media_lookup_table_t* media_lookup_table, char *medium_name,
 		unsigned int max_len)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
   /* We should really use snprintf() here, but not all systems have it */
   sprintf(medium_name, "livemedia%d", media_lookup_table->name_generator++);
 }
@@ -390,6 +460,9 @@ void __livemedia_tables__free(livemedia_tables_t *tables)
  */
 livemedia_tables_t *livemedia__new__tables(void)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	livemedia_tables_t *tables;
 	tables = __livemedia_tables__alloc();
 	if (tables) 
@@ -412,6 +485,9 @@ void livemedia__delete__tables(livemedia_tables_t *tables)
  */
 void livemedia_tables__delete__impl(livemedia_tables_t *tables)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	if (tables) {
 		__livemedia_tables__deinit(tables);
 		__livemedia_tables__free(tables);
@@ -425,14 +501,20 @@ void livemedia_tables__delete__impl(livemedia_tables_t *tables)
 /*
  * Normal functions
  */
-livemedia_tables_t* livemedia_tables__get_our_tables__static(bool create_if_not_present)
+livemedia_tables_t* livemedia_tables__get_our_tables__static(bool create_if_not_present /* default: true */)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	if (livemedia__global_tables == NULL && create_if_not_present)
 		livemedia__global_tables = livemedia__new__tables();
 	return livemedia__global_tables;
 }
 void livemedia_tables__reclaim_if_possible(livemedia_tables_t *tables)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	if (tables->media_table == NULL && tables->socket_table == NULL) {
 		livemedia__global_tables = NULL;
 		livemedia__delete__tables(tables);

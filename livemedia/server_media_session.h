@@ -5,14 +5,11 @@
 #include <sys/types.h>
 #include <stdbool.h>
 #include "media.h"
-#include "../groupsock/net_address.h"
+#include "net_address.h"
 #include "framed_source.h"
 #include "rtp_sink.h"
 #include "rtcp.h"
 
-typedef void (*task_func)(void *client_data);
-typedef void server_request_alternative_byte_handler(void* instance,
-		u_int8_t request_byte);
 struct _livemedia_server_media_subsession_t;
 
 /*****************************************************************
@@ -61,7 +58,7 @@ typedef struct _livemedia_server_media_subsession_t {
 	port_num_bits port_num_for_sdp;
 	struct _livemedia_server_media_subsession_t *next;
 	unsigned int track_number; /* within an enclosing ServerMediaSession */
-	char const* track_id;
+	char *track_id;
 
 	char const *(*sdp_lines)(
 			struct _livemedia_server_media_subsession_t *server_media_subsession);
@@ -71,7 +68,7 @@ typedef struct _livemedia_server_media_subsession_t {
 			net_address_bits client_address, /* in */
 			groupsock_port_t const *client_rtp_port, /* in */
 			groupsock_port_t const *client_rtcp_port, /* in */
-			int tcp_socket_num,  /* in (-1 means use UDP, not TCP) */
+			uv_tcp_t *tcp_socket_num,  /* in (-1 means use UDP, not TCP) */
 			unsigned char rtp_channel_id, /* in (used if TCP)*/
 			unsigned char rtcp_channel_id, /* in (used if TCP)*/
 			net_address_bits *destination_address, /* in out */
@@ -83,10 +80,10 @@ typedef struct _livemedia_server_media_subsession_t {
 	void (*start_stream)(
 			struct _livemedia_server_media_subsession_t *server_media_subsession,
 			unsigned int client_session_id, void *stream_token,
-			task_func (*rtcp_rr_handler), void *rtcp_rr_handler_client_data,
+			usage_environment__task_func *rtcp_rr_handler, void *rtcp_rr_handler_client_data,
 			unsigned short *rtp_seq_num,
-			unsigned int *rtp_time_stamp,
-			server_request_alternative_byte_handler *server_request_alternative_byte_handler,
+			unsigned int *rtp_timestamp,
+			livemedia__server_request_alternative_byte_handler *server_request_alternative_byte_handler,
 			void *server_request_alternative_byte_handler_client_data);
 	void (*pause_stream)(
 			struct _livemedia_server_media_subsession_t *server_media_subsession,
@@ -292,7 +289,7 @@ void livemedia_server_media_subsession__get_stream_parameters(
 		net_address_bits client_address, 
 		groupsock_port_t const *client_rtp_port, 
 		groupsock_port_t const *client_rtcp_port, 
-		int tcp_socket_num,  
+		uv_tcp_t *tcp_socket_num,  
 		unsigned char rtp_channel_id, 
 		unsigned char rtcp_channel_id, 
 		net_address_bits *destination_address, 
@@ -304,10 +301,10 @@ void livemedia_server_media_subsession__get_stream_parameters(
 void livemedia_server_media_subsession__start_stream(
 		livemedia_server_media_subsession_t *server_media_subsession,
 		unsigned int client_session_id, void *stream_token,
-		task_func *rtcp_rr_handler, void *rtcp_rr_handler_client_data,
+		usage_environment__task_func *rtcp_rr_handler, void *rtcp_rr_handler_client_data,
 		unsigned short *rtp_seq_num,
-		unsigned int *rtp_time_stamp,
-		server_request_alternative_byte_handler *server_request_alternative_byte_handler,
+		unsigned int *rtp_timestamp,
+		livemedia__server_request_alternative_byte_handler *server_request_alternative_byte_handler,
 		void *server_request_alternative_byte_handler_client_data);
 void livemedia_server_media_subsession__pause_stream(
 		livemedia_server_media_subsession_t *server_media_subsession,
@@ -393,7 +390,7 @@ void livemedia_server_media_subsession__delete__impl(livemedia_medium_t *medium)
 /*
  * Functions in header file
  */
-unsigned int livemedia_server_media_subsession__track_num(
+unsigned int livemedia_server_media_subsession__track_number(
 		livemedia_server_media_subsession_t *server_media_subsession);
 
 /*
@@ -404,7 +401,7 @@ char const *livemedia_server_media_subsession__track_id(
 void livemedia_server_media_subsession__set_server_address_and_port_for_sdp(
 		livemedia_server_media_subsession_t *server_media_subsession,
 		net_address_bits address_bits, port_num_bits port_bits);
-char const *livemedia_server_media_subsession__range_sdp_line(
+char *livemedia_server_media_subsession__range_sdp_line(
 		livemedia_server_media_subsession_t *server_media_subsession);
 
 #endif

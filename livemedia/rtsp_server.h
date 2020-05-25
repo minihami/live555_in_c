@@ -1,11 +1,20 @@
 #ifndef __LIVEMEDIA_RTSP_SERVER_H__
 #define __LIVEMEDIA_RTSP_SERVER_H__
 #include "generic_media_server.h"
-#include "livemedia_version.h"
+#include "../usage_environment/usage_environment_version.h"
 #include "rtsp_common.h"
 
-/*TODO:?
- * #include "DigestAuthentication.hh" */
+#include "digest_authentication.h"
+
+typedef struct _write_req_t {
+	uv_write_t req;
+	uv_buf_t buf;
+} write_req_t; 
+typedef struct _rtsp_server_write_ctx_t {
+	livemedia_generic_media_server_client_connection_t *generic_media_server_client_connection; 
+	int num_bytes_remaining;
+	int new_bytes_read;
+} rtsp_server_write_ctx_t;
 
 /*****************************************************************
  * RTSPServer:GenericMediaServer (Structure Declarations)
@@ -70,8 +79,8 @@ typedef struct _livemedia_rtsp_server_rtsp_client_connection_t {
 	unsigned char *last_crlf;
 	unsigned int *recursion_count;
 	char const *current_cseq;
-	/* TODO:DigestAuthentication
-	 * Authenticator fCurrentAuthenticator; // used if access control is needed */
+	livemedia_authenticator_t current_authenticator; 
+	/* used if access control is needed */
 	char *our_session_cookie; /* used for optional RTSP-over-HTTP tunneling */
 	unsigned int base64_remainder_count; /* used for optional RTSP-over-HTTP tunneling (possible values: 0,1,2,3) */
 
@@ -86,8 +95,7 @@ typedef struct _livemedia_rtsp_server_rtsp_client_connection_t {
 			char const *full_request_str);
 	void (*handle_cmd_describe)(
 			struct _livemedia_rtsp_server_rtsp_client_connection_t *rtsp_server_rtsp_client_connection, 
-			char const *url, char const *url_suffix, char const *full_request_str,
-			bool reuse_connection, bool deliver_via_tcp, char const *proxy_url_suffix);
+			char const *url_pre_suffix, char const *url_suffix, char const *full_request_str);
 	void (*handle_cmd_register)(
 			struct _livemedia_rtsp_server_rtsp_client_connection_t *rtsp_server_rtsp_client_connection,
 			char const *cmd /*"REGISTER" or "DEREGISTER"*/,
@@ -161,17 +169,17 @@ typedef struct _livemedia_rtsp_server_rtsp_client_session_t {
 	bool stream_after_setup;
 	unsigned char tcp_stream_id_count; /* used for (optional) RTP/TCP */
 	unsigned num_stream_states;
-	struct _stream_state_t {
+	struct stream_state_t {
 		livemedia_server_media_subsession_t *subsession;
-		int tcp_socket_num;
+		uv_tcp_t *tcp_socket_num;
 		void *stream_token;
-	} *stream_state;
+	} *stream_states;
 
 	/* virtual function pointers */
 	void (*handle_cmd_setup)(
 			struct _livemedia_rtsp_server_rtsp_client_session_t *rtsp_server_rtsp_client_session,
 			livemedia_rtsp_server_rtsp_client_connection_t *our_client_connecion,
-			char const *url_pre_suffix, char const *url_suffix, char const *full_request_str);
+			char *url_pre_suffix, char *url_suffix, char const *full_request_str);
 	void (*handle_cmd_within_session)(
 			struct _livemedia_rtsp_server_rtsp_client_session_t *rtsp_server_rtsp_client_session,
 			livemedia_rtsp_server_rtsp_client_connection_t *our_client_connecion,
@@ -255,7 +263,7 @@ livemedia_user_authentication_database_t *livemedia_rtsp_server__get_authenticat
 		livemedia_rtsp_server_t *rtsp_server, char const *cmd_name);
 bool livemedia_rtsp_server__special_client_access_check(livemedia_rtsp_server_t *rtsp_server,
 		uv_tcp_t *client_socket, struct sockaddr_in *client_addr,
-		char const* url_suffix);
+		char const* url_suffix, char const *username);
 /* a hook that allows subrtsp_server_rtsp_client_connection_params_for_registered servers to do server-specific access checking
  * on each client (e.g., based on client ip address), without using digest authentication. */
 bool livemedia_rtsp_server__special_client_user_access_check(livemedia_rtsp_server_t *rtsp_server,
@@ -286,14 +294,19 @@ bool livemedia_rtsp_server__special_client_access_check__impl(livemedia_rtsp_ser
 bool livemedia_rtsp_server__special_client_user_access_check__impl(livemedia_rtsp_server_t *rtsp_server,
 		uv_tcp_t *client_socket, struct sockaddr_in *client_addr,
 		char const* url_suffix, char const *username);
-void livemedia_rtsp_server__delete__impl(livemedia_medium_t *medium);
+livemedia_generic_media_server_client_connection_t *livemedia_rtsp_server__create_new_client_connection__impl(
+		livemedia_generic_media_server_t *generic_media_server,
+		uv_tcp_t *client_socket, struct sockaddr_in client_addr);
+livemedia_generic_media_server_client_session_t *livemedia_rtsp_server__create_new_client_session__impl(
+		livemedia_generic_media_server_t *generic_media_server, u_int32_t session_id);
 bool livemedia_rtsp_server__is_rtsp_server__impl(livemedia_medium_t *medium);
+void livemedia_rtsp_server__delete__impl(livemedia_medium_t *medium);
 
 
 /*
  * Functions in header file
  */
-void livemedia_rtsp_server__diable_stream_rtp_over_tcp(livemedia_rtsp_server_t *rtsp_server);
+void livemedia_rtsp_server__disable_stream_rtp_over_tcp(livemedia_rtsp_server_t *rtsp_server);
 
 /*
  * Normal functions
@@ -338,7 +351,7 @@ unsigned int livemedia_rtsp_server__deregister_stream(livemedia_rtsp_server_t *r
 		char const *proxy_url_suffix);
 /* Used to turn off a previous "registerStream()" - using our custom "DEREGISTER" RTSP command. */
 char *livemedia_rtsp_server__rtsp_url(livemedia_rtsp_server_t *rtsp_server,
-		livemedia_server_media_session_t const *server_media_session, uv_tcp_t *client_socket);
+		livemedia_server_media_session_t *server_media_session, uv_tcp_t *client_socket);
 /* returns a "rtsp://" URL that could be used to access the
  * specified session (which must already have been added to
  * us using "addServerMediaSession()".
@@ -366,11 +379,11 @@ port_num_bits livemedia_rtsp_server__http_server_port_num(
 void livemedia_rtsp_server__incoming_connection_handler_http__static(void *instance);
 void livemedia_rtsp_server__incoming_connection_handler_http(livemedia_rtsp_server_t *rtsp_server);
 void livemedia_rtsp_server__note_tcp_streaming_on_socket(livemedia_rtsp_server_t *rtsp_server,
-		int socket_num, livemedia_rtsp_server_rtsp_client_session_t *client_session, unsigned int track_num);
+		uv_tcp_t *socket_num, livemedia_rtsp_server_rtsp_client_session_t *client_session, unsigned int track_num);
 void livemedia_rtsp_server__unnote_tcp_streaming_on_socket(livemedia_rtsp_server_t *rtsp_server,
-		int socket_num, livemedia_rtsp_server_rtsp_client_session_t *client_session, unsigned int track_num);
+		uv_tcp_t *socket_num, livemedia_rtsp_server_rtsp_client_session_t *client_session, unsigned int track_num);
 void livemedia_rtsp_server__stop_tcp_streaming_on_socket(livemedia_rtsp_server_t *rtsp_server,
-		int socket_num);
+		uv_tcp_t *socket_num);
 
 /*****************************************************************
  * RTSPClientConnection:GenericMediaServer::ClientConnection (Function Declarations)
@@ -404,8 +417,7 @@ void livemedia_rtsp_server_rtsp_client_connection__handle_cmd_set_parameter(
 		char const *full_request_str);
 void livemedia_rtsp_server_rtsp_client_connection__handle_cmd_describe(
 		livemedia_rtsp_server_rtsp_client_connection_t *rtsp_server_rtsp_client_connection,
-		char const *url, char const *url_suffix, char const *full_request_str,
-		bool reuse_connection, bool deliver_via_tcp, char const *proxy_url_suffix);
+		char const *url, char const *url_suffix, char const *full_request_str);
 void livemedia_rtsp_server_rtsp_client_connection__handle_cmd_register(
 		livemedia_rtsp_server_rtsp_client_connection_t *rtsp_server_rtsp_client_connection,
 		char const *cmd /*"REGISTER" or "DEREGISTER"*/,
@@ -461,8 +473,7 @@ void livemedia_rtsp_server_rtsp_client_connection__handle_cmd_set_parameter__imp
 		char const *full_request_str);
 void livemedia_rtsp_server_rtsp_client_connection__handle_cmd_describe__impl(
 		livemedia_rtsp_server_rtsp_client_connection_t *rtsp_server_rtsp_client_connection,
-		char const *url, char const *url_suffix, char const *full_request_str,
-		bool reuse_connection, bool deliver_via_tcp, char const *proxy_url_suffix);
+		char const *url_pre_suffix, char const *url_suffix, char const *full_request_str);
 void livemedia_rtsp_server_rtsp_client_connection__handle_cmd_register__impl(
 		livemedia_rtsp_server_rtsp_client_connection_t *rtsp_server_rtsp_client_connection,
 		char const *cmd /*"REGISTER" or "DEREGISTER"*/,
@@ -505,7 +516,7 @@ void livemedia_rtsp_server_rtsp_client_connection__continue_handling_register1__
 		livemedia_rtsp_server_rtsp_client_connection_t *rtsp_server_rtsp_client_connection,
 		livemedia_rtsp_server_rtsp_client_connection_params_for_register_t *params);
 void livemedia_rtsp_server_rtsp_client_connection__handle_request_bytes__impl(
-		livemedia_generic_media_server_t *generic_media_server, int new_bytes_read);
+		livemedia_generic_media_server_client_connection_t *generic_media_server_client_connection, int new_bytes_read);
 void livemedia_rtsp_server_rtsp_client_connection__delete__impl(livemedia_medium_t *medium);
 
 /*
@@ -623,7 +634,7 @@ void livemedia__delete__rtsp_server_rtsp_client_session(livemedia_rtsp_server_rt
 void livemedia_rtsp_server_rtsp_client_session__handle_cmd_setup(
 		livemedia_rtsp_server_rtsp_client_session_t *rtsp_server_rtsp_client_session,
 		livemedia_rtsp_server_rtsp_client_connection_t *our_client_connecion,
-		char const *url_pre_suffix, char const *url_suffix, char const *full_request_str);
+		char *url_pre_suffix, char *url_suffix, char const *full_request_str);
 void livemedia_rtsp_server_rtsp_client_session__handle_cmd_within_session(
 		livemedia_rtsp_server_rtsp_client_session_t *rtsp_server_rtsp_client_session,
 		livemedia_rtsp_server_rtsp_client_connection_t *our_client_connecion,
@@ -656,7 +667,7 @@ void livemedia_rtsp_server_rtsp_client_session__handle_cmd_set_parameter(
 void livemedia_rtsp_server_rtsp_client_session__handle_cmd_setup__impl(
 		livemedia_rtsp_server_rtsp_client_session_t *rtsp_server_rtsp_client_session,
 		livemedia_rtsp_server_rtsp_client_connection_t *our_client_connecion,
-		char const *url_pre_suffix, char const *url_suffix, char const *full_request_str);
+		char *url_pre_suffix, char *url_suffix, char const *full_request_str);
 void livemedia_rtsp_server_rtsp_client_session__handle_cmd_within_session__impl(
 		livemedia_rtsp_server_rtsp_client_session_t *rtsp_server_rtsp_client_session,
 		livemedia_rtsp_server_rtsp_client_connection_t *our_client_connecion,
@@ -682,11 +693,9 @@ void livemedia_rtsp_server_rtsp_client_session__handle_cmd_set_parameter__impl(
 		livemedia_rtsp_server_rtsp_client_session_t *rtsp_server_rtsp_client_session,
 		livemedia_rtsp_server_rtsp_client_connection_t *our_client_connecion,
 		livemedia_server_media_subsession_t *subsession, char const *full_request_str);
-livemedia_generic_media_server_client_session_t *livemedia_rtsp_server_rtsp_client_session__create_new_client_session__impl(
-		livemedia_generic_media_server_t *generic_media_server, u_int32_t session_id);
 
 void livemedia_rtsp_server_rtsp_client_session__delete__impl(
-		livemedia_rtsp_server_rtsp_client_session_t *rtsp_server_rtsp_client_session);
+		livemedia_generic_media_server_client_session_t *generic_media_server_client_session);
 
 /*
  * Functions in header file
@@ -778,8 +787,9 @@ void livemedia_rtsp_server_with_register_proxying__delete__impl(livemedia_medium
 /*
  * Normal functions
  */
-livemedia_rtsp_server_with_register_proxying__create_new__static(
-		groupsock_port_t our_port, livemedia_user_authentication_database_t *auth_database,
+static livemedia_rtsp_server_with_register_proxying_t *livemedia_rtsp_server_with_register_proxying__create_new__static(
+		groupsock_port_t our_port, 
+		livemedia_user_authentication_database_t *auth_database,
 		livemedia_user_authentication_database_t *auth_database_for_register,
 		unsigned int reclamation_seconds,
 		bool stream_rtp_over_tcp,

@@ -10,7 +10,9 @@
 #include "hash_table.h"
 #endif
 
-
+#ifndef __USAGE_ENVIRONMENT_H__
+#include "../usage_environment/usage_environment.h"
+#endif
 
 #define LIVEMEDIA_MEDIUM_NAME_MAX_LEN	30
 
@@ -22,6 +24,7 @@
 typedef struct _livemedia_medium_t {
 	char medium_name[LIVEMEDIA_MEDIUM_NAME_MAX_LEN];
 	uv_timer_t *next_task;
+	void *data;
 
 	/* Test for specific types of media: */
 	bool (*is_source)(struct _livemedia_medium_t *);
@@ -102,7 +105,8 @@ void livemedia_medium__delete__impl(livemedia_medium_t *medium);
 /*
  * Functions in header file
  */
-char const* livemedia_medium__name(livemedia_medium_t *medium);
+char const *livemedia_medium__name(livemedia_medium_t *medium);
+uv_timer_t *livemedia_medium__next_task(livemedia_medium_t *medium);
 
 /*
  * Normal functions

@@ -22,7 +22,13 @@ char *livemedia__str_dup(char const* str)
 	return copy;
 }
 
-char *livemedia__str_dup_size(char const *str, size_t *result_buf_size)
+char *livemedia__str_dup_size(char const *str)
+{
+	size_t dummy;
+	return livemedia__str_dup_size_get_buf_size(str, &dummy);
+}
+
+char *livemedia__str_dup_size_get_buf_size(char const *str, size_t *result_buf_size)
 {
 	size_t len;
 	char *copy;

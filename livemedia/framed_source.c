@@ -38,9 +38,9 @@ void __livemedia_framed_source__init(livemedia_framed_source_t *framed_source)
 	framed_source->do_get_next_frame = NULL;
 	framed_source->do_stop_getting_frames =
 		livemedia_framed_source__do_stop_getting_frames__impl;
-	framed_source->media_source.is_framed_source =
+	((livemedia_media_source_t *)framed_source)->is_framed_source =
 		livemedia_framed_source__is_framed_source__impl;
-	framed_source->media_source.medium.delete = livemedia_framed_source__delete__impl;
+	((livemedia_medium_t *)framed_source)->delete = livemedia_framed_source__delete__impl;
 }
 void __livemedia_framed_source__deinit(livemedia_framed_source_t *framed_source)
 {
@@ -58,6 +58,9 @@ void __livemedia_framed_source__free(livemedia_framed_source_t *framed_source)
  */
 livemedia_framed_source_t *livemedia__new__framed_source(void)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	livemedia_framed_source_t *framed_source;
 
 	framed_source = __livemedia_framed_source__alloc();
@@ -72,6 +75,9 @@ livemedia_framed_source_t *livemedia__new__framed_source(void)
 unsigned int livemedia_framed_source__max_frame_size(
 		livemedia_framed_source_t *framed_source)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	if(framed_source->max_frame_size)
 		return framed_source->max_frame_size(framed_source);
 	return 0;
@@ -79,6 +85,9 @@ unsigned int livemedia_framed_source__max_frame_size(
 void livemedia_framed_source__do_get_next_frame(
 		livemedia_framed_source_t *framed_source)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	if(framed_source->do_get_next_frame)
 		return framed_source->do_get_next_frame(framed_source);
 	return ;
@@ -87,6 +96,9 @@ void livemedia_framed_source__do_get_next_frame(
 void livemedia_framed_source__do_stop_getting_frames(
 		livemedia_framed_source_t *framed_source)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	if(framed_source->do_stop_getting_frames)
 		return framed_source->do_stop_getting_frames(framed_source);
 	return ;
@@ -98,25 +110,38 @@ void livemedia_framed_source__do_stop_getting_frames(
 unsigned int livemedia_framed_source__max_frame_size__impl(
 		livemedia_framed_source_t *framed_source)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
   /* By default, this source has no maximum frame size. */
 	return 0;
 }
 void livemedia_framed_source__do_stop_getting_frames__impl(
 		livemedia_framed_source_t *framed_source)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
   /* Default implementation: Do nothing except cancel any pending 'delivery' task: */
-	uv_timer_stop(framed_source->media_source.medium.next_task);
+	uv_timer_stop(((livemedia_medium_t *)framed_source)->next_task);
   /* Subclasses may wish to redefine this function. */
 	return ;
 }
 bool livemedia_framed_source__is_framed_source__impl(
 		livemedia_media_source_t *media_source)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	return true;
 }
 void livemedia_framed_source__delete__impl(livemedia_medium_t *medium)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	livemedia_framed_source_t *framed_source;
+
 	framed_source = (livemedia_framed_source_t *)medium;
 	if (framed_source) {
 		__livemedia_framed_source__deinit(framed_source);
@@ -131,6 +156,9 @@ void livemedia_framed_source__delete__impl(livemedia_medium_t *medium)
 bool livemedia_framed_source__is_currently_awaiting_data(
 		livemedia_framed_source_t *framed_source)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	return framed_source->is_currently_awaiting_data;
 }
 /*
@@ -139,6 +167,9 @@ bool livemedia_framed_source__is_currently_awaiting_data(
 bool livemedia_framed_source__lookup_by_name__static(char const *source_name,
 		livemedia_framed_source_t **result_source)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	*result_source = NULL; /* unless we succeed */
 	livemedia_media_source_t *source;
 	if (!livemedia_media_source__lookup_by_name__static(source_name, &source))
@@ -157,6 +188,9 @@ void livemedia_framed_source__get_next_frame(livemedia_framed_source_t *framed_s
 		livemedia_framed_source__on_close_func *on_close_func,
 		void *on_close_client_data)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
   /* Make sure we're not already being read: */
 	if (framed_source->is_currently_awaiting_data) {
 		fprintf(stderr, "FramedSource[%p] %s(): attempting to read more than once at the"
@@ -177,6 +211,9 @@ void livemedia_framed_source__get_next_frame(livemedia_framed_source_t *framed_s
 }
 void livemedia_framed_source__handle_closure__static(void *client_data)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	livemedia_framed_source_t *source;
 
 	source = (livemedia_framed_source_t *)client_data;
@@ -184,13 +221,19 @@ void livemedia_framed_source__handle_closure__static(void *client_data)
 }
 void livemedia_framed_source__handle_closure(livemedia_framed_source_t *framed_source)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	framed_source->is_currently_awaiting_data = false; /* because we got a close instead */
 	if (framed_source->on_close_func != NULL)
-		(*(framed_source->on_close_func))(framed_source->on_close_func);
+		(*(framed_source->on_close_func))(framed_source->on_close_client_data);
 }
 void livemedia_framed_source__stop_getting_frames(
 		livemedia_framed_source_t *framed_source)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	framed_source->is_currently_awaiting_data = false;
 	/* indicates that we can be read again */
 	framed_source->after_getting_func = NULL;
@@ -201,6 +244,9 @@ void livemedia_framed_source__stop_getting_frames(
 }
 void livemedia_framed_source__after_getting__static(livemedia_framed_source_t *source)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	source->is_currently_awaiting_data = false;
 	/* indicates that we can be read again
 	 * Note that this needs to be done here, in case the "fAfterFunc"

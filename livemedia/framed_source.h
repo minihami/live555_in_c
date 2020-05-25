@@ -6,10 +6,11 @@
 /*****************************************************************
  * FramedSource:MediaSource (Structure Declarations)
  ****************************************************************/
-typedef void (*livemedia_framed_source__after_getting_func)(void *client_data,
+typedef void (livemedia_framed_source__after_getting_func)(void *client_data,
 		unsigned int frame_size, unsigned int num_truncated_bytes, 
 		struct timeval presentation_time, unsigned int duration_in_microseconds);
-typedef void (*livemedia_framed_source__on_close_func)(void *client_data);
+typedef void (livemedia_framed_source__on_close_func)(void *client_data);
+
 typedef struct _livemedia_framed_source_t {
 	livemedia_media_source_t media_source;
 

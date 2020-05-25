@@ -59,6 +59,9 @@ void __livemedia_media_source__free(livemedia_media_source_t *media_source)
  */
 livemedia_media_source_t *livemedia__new__media_source(void)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	livemedia_media_source_t *media_source;
 
 	media_source = __livemedia_media_source__alloc();
@@ -161,68 +164,110 @@ bool livemedia_media_source__is_mpeg2_transport_stream_multiplexor(
 void livemedia_media_source__get_attributes__impl(
 		struct _livemedia_media_source_t *media_source)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 }
 char const *livemedia_media_source__mime_type__impl(
 		struct _livemedia_media_source_t *media_source)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
   return "application/OCTET-STREAM"; // default type
 }
 bool livemedia_media_source__is_framed_source__impl(
 		struct _livemedia_media_source_t *media_source)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	return false; /* default implementation */
 }
 bool livemedia_media_source__is_rtp_source__impl(
 		struct _livemedia_media_source_t *media_source)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	return false; /* default implementation */
 }
 bool livemedia_media_source__is_mpeg1or2_video_stream_framer__impl(
 		struct _livemedia_media_source_t *media_source)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	return false; /* default implementation */
 }
 bool livemedia_media_source__is_mpeg4_video_stream_framer__impl(
 		struct _livemedia_media_source_t *media_source)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	return false; /* default implementation */
 }
 bool livemedia_media_source__is_h264_video_stream_framer__impl(
 		struct _livemedia_media_source_t *media_source)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	return false; /* default implementation */
 }
 bool livemedia_media_source__is_h265_video_stream_framer__impl(
 		struct _livemedia_media_source_t *media_source)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	return false; /* default implementation */
 }
 bool livemedia_media_source__is_dv_video_stream_framer__impl(
 		struct _livemedia_media_source_t *media_source)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	return false; /* default implementation */
 }
 bool livemedia_media_source__is_jpeg_video_source__impl(
 		struct _livemedia_media_source_t *media_source)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	return false; /* default implementation */
 }
 bool livemedia_media_source__is_amr_audio_source__impl(
 		struct _livemedia_media_source_t *media_source)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	return false; /* default implementation */
 }
 bool livemedia_media_source__is_mpeg2_transport_stream_multiplexor__impl(
 		struct _livemedia_media_source_t *media_source)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	return false; /* default implementation */
 }
 bool livemedia_media_source__is_source__impl(livemedia_medium_t *medium)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	return true;
 }
 void livemedia_media_source__delete__impl(livemedia_medium_t *medium)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	livemedia_media_source_t *media_source;
 
 	media_source = (livemedia_media_source_t *)medium;
@@ -244,6 +289,9 @@ void livemedia_media_source__delete__impl(livemedia_medium_t *medium)
 bool livemedia_media_source__lookup_by_name__static(char const* source_name,
 		livemedia_media_source_t **result_source)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	*result_source = NULL; /* unless we succeed */
 
 	livemedia_medium_t *medium;

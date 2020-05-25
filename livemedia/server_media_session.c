@@ -6,9 +6,7 @@
 #include "rtcp.h"
 
 
-#ifndef __LIVEMEDIA_VERSION_H__
-#include "livemedia_version.h"
-#endif
+#include "../usage_environment/usage_environment_version.h"
 
 static char const* const lib_name_str = "livemedia streaming media v";
 char const* const lib_version_str = WEBGATE_LIBRARY_VERSION_STRING;
@@ -101,6 +99,9 @@ livemedia_server_media_session_t *livemedia__new__server_media_session(
 		 char const *stream_name, char const *info, char const *description, bool is_ssm,
 		char const *misc_sdp_lines)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	livemedia_server_media_session_t *server_media_session;
 
 	server_media_session = __livemedia_server_media_session__alloc();
@@ -109,12 +110,6 @@ livemedia_server_media_session_t *livemedia__new__server_media_session(
 				info, description, is_ssm, misc_sdp_lines);
 
 	return server_media_session;
-}
-void livemedia__delete__server_media_session(
-		livemedia_server_media_session_t *server_media_session)
-{
-	if (server_media_session && server_media_session->medium.delete)
-		server_media_session->medium.delete(server_media_session);
 }
 /*
  * Functions for virtual functions
@@ -132,15 +127,24 @@ void livemedia_server_media_session__note_liveness(
 void livemedia_server_media_session__note_liveness__impl(
 			livemedia_server_media_session_t *server_media_session)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	/* default implementaion: do nothing */
 }
 bool livemedia_server_media_session__is_server_media_session__impl(
 		livemedia_medium_t *medium)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	return true;
 }
 void livemedia_server_media_session__delete__impl(livemedia_medium_t *medium)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	livemedia_server_media_session_t *server_media_session;
 	server_media_session = (livemedia_server_media_session_t *)medium;
 	if (server_media_session) {
@@ -155,32 +159,50 @@ void livemedia_server_media_session__delete__impl(livemedia_medium_t *medium)
 char const *livemedia_server_media_session__stream_name(
 		livemedia_server_media_session_t *server_media_session)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	return server_media_session->stream_name;
 }
 unsigned int livemedia_server_media_session__num_subsessions(
 		livemedia_server_media_session_t *server_media_session)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	return server_media_session->subsession_counter;
 }
 unsigned int livemedia_server_media_session__reference_count(
 		livemedia_server_media_session_t *server_media_session)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	return server_media_session->reference_count;
 }
 void livemedia_server_media_session__increment_reference_count(
 		livemedia_server_media_session_t *server_media_session)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	++server_media_session->reference_count;
 }
 void livemedia_server_media_session__decrement_reference_count(
 		livemedia_server_media_session_t *server_media_session)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	if (server_media_session->reference_count > 0)
 		--server_media_session->reference_count;
 }
 bool *livemedia_server_media_session__delete_when_unreferenced(
 		livemedia_server_media_session_t *server_media_session)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	return &server_media_session->delete_when_unreferenced;
 }
 
@@ -191,12 +213,18 @@ livemedia_server_media_session_t *livemedia_server_media_session__create_new__st
 		char const *stream_name, char const *info, char const *description, bool is_ssm,
 		char const *misc_sdp_lines)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	return livemedia__new__server_media_session(stream_name, info, description, is_ssm,
 			misc_sdp_lines);
 }
 bool livemedia_server_media_session__lookup_by_name__static(char const *medium_name,
 		livemedia_server_media_session_t **result_session)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	*result_session = NULL;
 	livemedia_medium_t *medium;
 	if (!livemedia_medium__lookup_by_name__static(medium_name, &medium))
@@ -212,6 +240,9 @@ bool livemedia_server_media_session__lookup_by_name__static(char const *medium_n
 char *livemedia_server_media_session__generate_sdp_description(
 		livemedia_server_media_session_t *server_media_session)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	groupsock_address_string_t *ip_address_str;
 	unsigned int ip_address_str_size;
 	char *source_filter_line;
@@ -224,10 +255,10 @@ char *livemedia_server_media_session__generate_sdp_description(
 	char buf[100];
 	char *media_sdp;
 	unsigned int media_sdp_length;
-	/*ip_address_str= groupsock__new__address_string_by_net_address_bits(
+
+	ip_address_str= groupsock__new__address_string_by_net_address_bits(
 			groupsock__our_ip_address()); 
 	ip_address_str_size = strlen(groupsock_address_string__val(ip_address_str));
-TODO: groupsock/net_address	*/
   
 	/* For a SSM sessions, we need a "a=source-filter: incl ..." line also: */
 
@@ -256,6 +287,7 @@ TODO: groupsock/net_address	*/
 		 for (subsession = server_media_session->subsessions_head; subsession != NULL;
 				 subsession = subsession->next) {
 			 sdp_lines = livemedia_server_media_subsession__sdp_lines(subsession);
+			 printf("sdp_lines in %s()\n", sdp_lines);
 			 if (sdp_lines == NULL)
 				 continue; /* the media is not available */
 			 sdp_length += strlen(sdp_lines);
@@ -352,6 +384,9 @@ bool livemedia_server_media_session__add_subsession(
 		livemedia_server_media_session_t *server_media_session,
 		livemedia_server_media_subsession_t *subsession)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	if (subsession->parent_session != NULL)
 		return false; /* it's already used */
 
@@ -369,6 +404,9 @@ bool livemedia_server_media_session__add_subsession(
 void livemedia_server_media_session__test_scale_factor(
 		livemedia_server_media_session_t *server_media_session, float *scale)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	/* First, try setting all subsessions to the desired scale.
 	 * If the subsessions' actual scales differ from each other, choose the
 	 * value that's closest to 1, and then try re-setting all subsessions to that
@@ -432,11 +470,14 @@ void livemedia_server_media_session__test_scale_factor(
 		ssscale = 1;
 		livemedia_server_media_subsession__test_scale_factor(subsession, &ssscale);
 	}
-	scale = 1;
+	*scale = 1;
 }
 float livemedia_server_media_session__duration(
 		livemedia_server_media_session_t *server_media_session)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	float min_subsession_duration;
 	float max_subsession_duration;
 	livemedia_server_media_subsession_t *subsession;
@@ -476,7 +517,10 @@ float livemedia_server_media_session__duration(
 void livemedia_server_media_session__delete_all_subsessions(
 		livemedia_server_media_session_t *server_media_session)
 {
-	livemedia_medium__close_by_medium_ptr__static(server_media_session->subsessions_head);
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
+	livemedia_medium__close_by_medium_ptr__static((livemedia_medium_t *)server_media_session->subsessions_head);
 	server_media_session->subsessions_head = server_media_session->subsessions_tail = NULL;
 	server_media_session->subsession_counter = 0;
 }
@@ -534,6 +578,9 @@ void __livemedia_server_media_subsession_iterator__free(
 livemedia_server_media_subsession_iterator_t *livemedia__new__server_media_subsession_iterator(
 		livemedia_server_media_session_t *session)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	livemedia_server_media_subsession_iterator_t *server_media_subsession_iterator;
 
 	server_media_subsession_iterator = __livemedia_server_media_subsession_iterator__alloc();
@@ -558,6 +605,9 @@ void livemedia__delete__server_media_subsession_iterator(
  */
 void livemedia_server_media_subsession_iterator__delete__impl(livemedia_server_media_subsession_iterator_t *server_media_subsession_iterator)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	if (server_media_subsession_iterator) {
 		__livemedia_server_media_subsession_iterator__deinit(server_media_subsession_iterator);
 		__livemedia_server_media_subsession_iterator__free(server_media_subsession_iterator);
@@ -573,6 +623,9 @@ void livemedia_server_media_subsession_iterator__delete__impl(livemedia_server_m
 livemedia_server_media_subsession_t * livemedia_server_media_subsession_iterator__next(
 		livemedia_server_media_subsession_iterator_t *server_media_subsession_iterator)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	livemedia_server_media_subsession_t *result;
 	result = server_media_subsession_iterator->next_ptr;
 	
@@ -585,6 +638,9 @@ livemedia_server_media_subsession_t * livemedia_server_media_subsession_iterator
 void livemedia_server_media_subsession_iterator__reset(
 		livemedia_server_media_subsession_iterator_t *server_media_subsession_iterator)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	server_media_subsession_iterator->next_ptr =
 		server_media_subsession_iterator->our_session->subsessions_head;
 }
@@ -651,7 +707,7 @@ void __livemedia_server_media_subsession__deinit(livemedia_server_media_subsessi
 	if(server_media_subsession->track_id)
 		free(server_media_subsession->track_id);
 
-	livemedia_medium__close_by_medium_ptr__static(server_media_subsession->next);
+	livemedia_medium__close_by_medium_ptr__static((livemedia_medium_t *)server_media_subsession->next);
 
 	__livemedia_medium__deinit(&server_media_subsession->medium);
 }
@@ -667,6 +723,9 @@ void __livemedia_server_media_subsession__free(livemedia_server_media_subsession
  */
 livemedia_server_media_subsession_t *livemedia__new__server_media_subsession(void)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	livemedia_server_media_subsession_t *server_media_subsession;
 
 	server_media_subsession = __livemedia_server_media_subsession__alloc();
@@ -690,7 +749,7 @@ void livemedia_server_media_subsession__get_stream_parameters(
 		net_address_bits client_address, 
 		groupsock_port_t const *client_rtp_port, 
 		groupsock_port_t const *client_rtcp_port, 
-		int tcp_socket_num,  
+		uv_tcp_t *tcp_socket_num,  
 		unsigned char rtp_channel_id, 
 		unsigned char rtcp_channel_id, 
 		net_address_bits *destination_address, 
@@ -710,16 +769,16 @@ void livemedia_server_media_subsession__get_stream_parameters(
 void livemedia_server_media_subsession__start_stream(
 		livemedia_server_media_subsession_t *server_media_subsession,
 		unsigned int client_session_id, void *stream_token,
-		task_func *rtcp_rr_handler, void *rtcp_rr_handler_client_data,
+		usage_environment__task_func *rtcp_rr_handler, void *rtcp_rr_handler_client_data,
 		unsigned short *rtp_seq_num,
-		unsigned int *rtp_time_stamp,
-		server_request_alternative_byte_handler *server_request_alternative_byte_handler,
+		unsigned int *rtp_timestamp,
+		livemedia__server_request_alternative_byte_handler *server_request_alternative_byte_handler,
 		void *server_request_alternative_byte_handler_client_data)
 {
 	if (server_media_subsession && server_media_subsession->start_stream)
 		server_media_subsession->start_stream(server_media_subsession,
 				client_session_id, stream_token, rtcp_rr_handler,
-				rtcp_rr_handler_client_data, rtp_seq_num, rtp_time_stamp, 
+				rtcp_rr_handler_client_data, rtp_seq_num, rtp_timestamp, 
 				server_request_alternative_byte_handler,
 				server_request_alternative_byte_handler_client_data);
 }
@@ -832,6 +891,9 @@ void livemedia_server_media_subsession__pause_stream__impl(
 		livemedia_server_media_subsession_t *server_media_subsession,
 		unsigned int client_session_id, void* stream_token)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	/* default implementation: do nothing */
 }
 void livemedia_server_media_subsession__seek_stream_relative__impl(
@@ -839,6 +901,9 @@ void livemedia_server_media_subsession__seek_stream_relative__impl(
 		unsigned int client_session_id, void* stream_token, double *seek_ntp,
 		double stream_duration, u_int64_t *num_bytes)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	/* default implementation: do nothing */
 	*num_bytes = 0;
 }
@@ -847,6 +912,9 @@ void livemedia_server_media_subsession__seek_stream_absolute__impl(
 		unsigned int client_session_id, void* stream_token, char **abs_start,
 		char **abs_end)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	/* default implementation: do nothing (but delete[] and assign 
 	 * "absStart" and "absEnd" to NULL, to show that we don't handle this) */
 	if(*abs_start) {
@@ -863,6 +931,9 @@ void livemedia_server_media_subsession__null_seek_stream__impl(
 		unsigned int client_session_id, void *stream_token, double stream_end_time,
 		u_int64_t *num_bytes)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	/* default implementation: do nothing */
 	*num_bytes = 0;
 }
@@ -870,12 +941,18 @@ void livemedia_server_media_subsession__set_stream_scale__impl(
 		livemedia_server_media_subsession_t *server_media_subsession,
 		unsigned client_session_id, void *stream_token, float scale)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	/* default implementation: do nothing */
 }
 float livemedia_server_media_subsession__get_current_npt__impl(
 		livemedia_server_media_subsession_t *server_media_subsession,
 		void *stream_token)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	/* default implementation: return 0.0 */
 	return 0.0;
 }
@@ -883,6 +960,9 @@ livemedia_framed_source_t *livemedia_server_media_subsession__get_stream_source_
 		livemedia_server_media_subsession_t *server_media_subsession,
 		void *stream_token)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	/* default implementation: return NULL */
 	return NULL;
 }
@@ -890,18 +970,27 @@ void livemedia_server_media_subsession__delete_stream__impl(
 		livemedia_server_media_subsession_t *server_media_subsession,
 		unsigned int client_session_id, void **stream_token)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	/* default implementation: do nothing */
 }
 void livemedia_server_media_subsession__test_scale_factor__impl(
 		livemedia_server_media_subsession_t *server_media_subsession,
 		float *scale)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	/* default implementation: Support scale = 1 only */
 	*scale = 1;
 }
 float livemedia_server_media_subsession__duration__impl(
 		livemedia_server_media_subsession_t *server_media_subsession)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	/* default implementation: assume an unbounded session */
 	return 0.0;
 }
@@ -909,6 +998,9 @@ void livemedia_server_media_subsession__get_absolute_time_range__impl(
 		livemedia_server_media_subsession_t *server_media_subsession,
 		char **abs_start_time, char **abs_end_time)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
   /* default implementation: We don't support seeking by 'absolute' time, 
    * so indicate this by setting both parameters to NULL: */
 	*abs_start_time = *abs_end_time = NULL;
@@ -916,6 +1008,9 @@ void livemedia_server_media_subsession__get_absolute_time_range__impl(
 
 void livemedia_server_media_subsession__delete__impl(livemedia_medium_t *medium)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	livemedia_server_media_subsession_t* server_media_subsession;
 
 	server_media_subsession = (livemedia_server_media_subsession_t *)medium;
@@ -923,7 +1018,7 @@ void livemedia_server_media_subsession__delete__impl(livemedia_medium_t *medium)
 		free(server_media_subsession->track_id);
 		server_media_subsession->track_id = NULL;
 	}
-	livemedia_medium__close_by_medium_ptr__static(server_media_subsession->next);
+	livemedia_medium__close_by_medium_ptr__static((livemedia_medium_t *)server_media_subsession->next);
 
 	if(server_media_subsession) {
 		__livemedia_server_media_subsession__deinit(server_media_subsession);
@@ -934,9 +1029,12 @@ void livemedia_server_media_subsession__delete__impl(livemedia_medium_t *medium)
 /*
  * Functions in header file
  */
-unsigned int livemedia_server_media_subsession__track_num(
+unsigned int livemedia_server_media_subsession__track_number(
 		livemedia_server_media_subsession_t *server_media_subsession)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	return server_media_subsession->track_number;
 }
 
@@ -946,6 +1044,9 @@ unsigned int livemedia_server_media_subsession__track_num(
 char const *livemedia_server_media_subsession__track_id(
 		livemedia_server_media_subsession_t *server_media_subsession)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	char buf[100];
 	if(server_media_subsession->track_number == 0)
 		return NULL;	/* not yet in a ServerMediaSession */
@@ -959,12 +1060,18 @@ void livemedia_server_media_subsession__set_server_address_and_port_for_sdp(
 		livemedia_server_media_subsession_t *server_media_subsession,
 		net_address_bits address_bits, port_num_bits port_bits)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 	server_media_subsession->server_address_for_sdp = address_bits;
 	server_media_subsession->port_num_for_sdp = port_bits;
 }
-char const *livemedia_server_media_subsession__range_sdp_line(
+char *livemedia_server_media_subsession__range_sdp_line(
 		livemedia_server_media_subsession_t *server_media_subsession)
 {
+#ifdef WEBGATE_DEBUG
+	printf("LOG: %s() in %s: %d line\n", __func__, __FILE__, __LINE__);
+#endif
 
   /* First, check for the special case where we support seeking by 'absolute' time: */
 
@@ -998,7 +1105,7 @@ char const *livemedia_server_media_subsession__range_sdp_line(
 
   /* Use our own duration for a "a=range:" line: */
 	our_duration = livemedia_server_media_subsession__duration(server_media_subsession);
-	if (our_duration = 0.0) {
+	if (our_duration == 0.0) {
 		return livemedia__str_dup("a=range:npt=0-\r\n");
 	} else {
 		memset(buf, 0x00, 100);

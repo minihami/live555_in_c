@@ -130,16 +130,54 @@ add_executable(${CMAKE_PROJECT_NAME}
 		livemedia/server_media_session.c
 		livemedia/rtsp_server.c
 		livemedia/rtsp_common.c
+		livemedia/media_sink.c
+		livemedia/rtp_sink.c
+		livemedia/rtp_source.c
+		livemedia/srtp_cryptographic_context.c
+		livemedia/rtp_interface.c
+		livemedia/rtcp.c
+		livemedia/mikey.c
+		livemedia/basic_udp_sink.c
+		livemedia/on_demand_server_media_subsession.c
+		livemedia/file_server_media_subsession.c
+		livemedia/h264_video_file_server_media_subsession.c
+		livemedia/multi_framed_rtp_sink.c
+		livemedia/video_rtp_sink.c
+		livemedia/framed_filter.c
+		livemedia/h264or5_video_rtp_sink.c
+		livemedia/h264_video_rtp_sink.c
+		livemedia/framed_file_source.c
+		livemedia/byte_stream_file_source.c
+		livemedia/base64.c
+		livemedia/multi_framed_rtp_source.c
+		livemedia/h264_video_rtp_source.c
+		livemedia/h264_video_stream_framer.c
+		livemedia/h264or5_video_stream_framer.c
+		livemedia/mpeg_video_stream_framer.c
+		livemedia/mpeg_video_stream_parser.c
+		livemedia/digest_authentication.c
+		livemedia/stream_parser.c
+		livemedia/our_md5.c
+		livemedia/input_file.c
+		livemedia/Locale.c
+		livemedia/rtcp_from_spec.c
+		livemedia/bit_vector.c
 		groupsock/groupsock_helper.c
-		groupsock/net_address.c
 		groupsock/inet.c
+		groupsock/net_interface.c
+		groupsock/net_address.c
+		groupsock/groupsock.c
+		groupsock/group_eid.c
 		)
-target_compile_options(${CMAKE_PROJECT_NAME} PUBLIC -g -Wall)
+	target_compile_options(${CMAKE_PROJECT_NAME} PUBLIC -g -Wall -DWEBGATE_DEBUG)
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
 		${zlib_INSTALL}/include
 		${openssl_INSTALL}/include
 		${curl_INSTALL}/include
 		${libuv_INSTALL}/include
+		livemedia
+		groupsock
+		usage_environment
 		.)
 target_link_libraries(${CMAKE_PROJECT_NAME}
 		${curl_INSTALL}/lib/libcurl.a
